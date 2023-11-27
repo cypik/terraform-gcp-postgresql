@@ -17,15 +17,15 @@ To use this module, you should have Terraform installed and configured for GCP. 
 
 ```hcl
 module "postgresql-db" {
-  source               = "git::https://github.com/opz0/terraform-gcp-postgresql.git?ref=v1.0.0"
-  name                 = "test"
-  environment          = "postgresql-db"
-  database_version     = "POSTGRES_9_6"
-  zone                 = "us-central1-c"
-  region               = "us-central1"
-  tier                 = "db-custom-1-3840"
-  deletion_protection  = false
-  random_instance_name = true
+  source                = "git::https://github.com/cypik/terraform-gcp-postgresql.git?ref=v1.0.0"
+  name                  = "test"
+  environment           = "postgresql-db"
+  database_version      = "POSTGRES_9_6"
+  zone                  = "us-central1-c"
+  region                = "us-central1"
+  tier                  = "db-custom-1-3840"
+  deletion_protection   = false
+  random_instance_name  = true
   ip_configuration = {
     ipv4_enabled        = true
     private_network     = null
@@ -60,10 +60,10 @@ Each module may have specific outputs. You can retrieve these outputs by referen
 - 'service_account_email_address' : The service account email address assigned to the instance.
 
 ## Examples
-For detailed examples on how to use this module, please refer to the 'examples' directory within this repository.
+For detailed examples on how to use this module, please refer to the [examples](https://github.com/cypik/terraform-gcp-postgresql/tree/master/example) directory within this repository.
 
 ## Author
 Your Name Replace '[License Name]' and '[Your Name]' with the appropriate license and your information. Feel free to expand this README with additional details or usage instructions as needed for your specific use case.
 
 ## License
-This project is licensed under the MIT License - see the [LICENSE](https://github.com/opz0/terraform-gcp-postgresql/blob/master/LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/cypik/terraform-gcp-postgresql/blob/master/LICENSE) file for details.
