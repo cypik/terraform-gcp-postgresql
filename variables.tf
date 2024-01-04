@@ -19,12 +19,12 @@ variable "label_order" {
 variable "managedby" {
   type        = string
   default     = ""
-  description = "ManagedBy, eg 'Opz0'."
+  description = "ManagedBy, eg 'cypik'."
 }
 
 variable "repository" {
   type        = string
-  default     = ""
+  default     = "https://github.com/cypik/terraform-gcp-postgresql"
   description = "Terraform current module repo"
 }
 
@@ -305,7 +305,7 @@ variable "additional_databases" {
 variable "user_name" {
   description = "The name of the default user"
   type        = string
-  default     = "default"
+  default     = "postgresql"
 }
 
 variable "user_password" {
