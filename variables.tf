@@ -191,6 +191,7 @@ variable "backup_configuration" {
     retention_unit                 = null
   }
 }
+
 variable "insights_config" {
   description = "The insights_config settings for the database."
   type = object({
@@ -228,51 +229,6 @@ variable "ip_configuration" {
   })
   default = {}
 }
-#
-#variable "read_replicas" {
-#  description = "List of read replicas to create. Encryption key is required for replica in different region. For replica in same region as master set encryption_key_name = null"
-#  type = list(object({
-#    name                  = string
-#    name_override         = optional(string)
-#    tier                  = optional(string)
-#    edition               = optional(string)
-#    availability_type     = optional(string)
-#    zone                  = optional(string)
-#    disk_type             = optional(string)
-#    disk_autoresize       = optional(bool)
-#    disk_autoresize_limit = optional(number)
-#    disk_size             = optional(string)
-#    user_labels           = map(string)
-#    database_flags = optional(list(object({
-#      name  = string
-#      value = string
-#    })), [])
-#    insights_config = optional(object({
-#      query_plans_per_minute  = optional(number, 5)
-#      query_string_length     = optional(number, 1024)
-#      record_application_tags = optional(bool, false)
-#      record_client_address   = optional(bool, false)
-#    }), null)
-#    ip_configuration = object({
-#      authorized_networks                           = optional(list(map(string)), [])
-#      ipv4_enabled                                  = optional(bool)
-#      private_network                               = optional(string, )
-#      require_ssl                                   = optional(bool)
-#      allocated_ip_range                            = optional(string)
-#      enable_private_path_for_google_cloud_services = optional(bool, false)
-#      psc_enabled                                   = optional(bool, false)
-#      psc_allowed_consumer_projects                 = optional(list(string), [])
-#    })
-#    encryption_key_name = optional(string)
-#  }))
-#  default = []
-#}
-
-#variable "read_replica_name_suffix" {
-#  description = "The optional suffix to add to the read instance name"
-#  type        = string
-#  default     = ""
-#}
 
 variable "db_name" {
   description = "The name of the default database to create"
