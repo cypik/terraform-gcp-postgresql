@@ -305,7 +305,7 @@ variable "additional_databases" {
 variable "user_name" {
   description = "The name of the default user"
   type        = string
-  default     = "default"
+  default     = "postgresql"
 }
 
 variable "user_password" {
