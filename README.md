@@ -9,11 +9,11 @@
 - [License](#license)
 
 ## Introduction
-This project deploys a Google Cloud infrastructure using Terraform to create **POSTGRESQL** .
+This project deploys a Google Cloud infrastructure using Terraform to create Postgresql .
 ## Usage
 To use this module, you should have Terraform installed and configured for GCP. This module provides the necessary Terraform configuration for creating GCP resources, and you can customize the inputs as needed. Below is an example of how to use this module:
 
-# Example: _postgresql-db_
+# Example: _Postgresql_
 
 ```hcl
 module "postgresql-db" {
@@ -60,7 +60,7 @@ Each module may have specific outputs. You can retrieve these outputs by referen
 - `service_account_email_address` : The service account email address assigned to the instance.
 
 ## Examples
-For detailed examples on how to use this module, please refer to the [EXAMPLES](https://github.com/cypik/terraform-gcp-postgresql/tree/master/example) directory within this repository.
+For detailed examples on how to use this module, please refer to the [Examples](https://github.com/cypik/terraform-gcp-postgresql/tree/master/example) directory within this repository.
 
 ## Author
 Your Name Replace **'[License Name]'** and **'[Your Name]'** with the appropriate license and your information. Feel free to expand this README with additional details or usage instructions as needed for your specific use case.
