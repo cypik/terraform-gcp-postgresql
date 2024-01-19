@@ -230,12 +230,6 @@ variable "ip_configuration" {
   default = {}
 }
 
-variable "db_name" {
-  description = "The name of the default database to create"
-  type        = string
-  default     = "default"
-}
-
 variable "db_charset" {
   description = "The charset for the default database"
   type        = string
