@@ -358,3 +358,9 @@ variable "connector_enforcement" {
   type        = bool
   default     = false
 }
+
+variable "db_name" {
+  type        = string
+  default     = ""
+  description = "The name of the database to be created."
+}

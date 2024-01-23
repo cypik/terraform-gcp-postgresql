@@ -182,7 +182,7 @@ resource "google_sql_database_instance" "default" {
 
 resource "google_sql_database" "default" {
   count           = var.enable_default_db ? 1 : 0
-  name            = var.user_name
+  name            = var.db_name
   project         = data.google_client_config.current.project
   instance        = google_sql_database_instance.default.name
   charset         = var.db_charset

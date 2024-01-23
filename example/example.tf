@@ -10,6 +10,8 @@ provider "google" {
 module "postgresql-db" {
   source               = "../"
   name                 = "test"
+  user_name            = "postgresql"
+  db_name              = "testdb"
   environment          = "postgresql-db"
   user_password        = "K9qrXiHi"
   database_version     = "POSTGRES_9_6"

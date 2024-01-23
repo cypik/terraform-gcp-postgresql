@@ -21,15 +21,17 @@ To use this module, you should have Terraform installed and configured for GCP. 
 module "postgresql-db" {
   source                = "cypik/postgresql/google"
   version               = "1.0.1"
-  name                  = "test"
-  environment           = "postgresql-db"
-  user_password         = "K9qrXi"
-  database_version      = "POSTGRES_9_6"
-  zone                  = "us-central1-c"
-  region                = "us-central1"
-  tier                  = "db-custom-1-3840"
-  deletion_protection   = false
-  random_instance_name  = true
+  name                 = "test"
+  user_name            = "postgresql"
+  db_name              = "testdb"
+  environment          = "postgresql-db"
+  user_password        = "K9qrXiHi"
+  database_version     = "POSTGRES_9_6"
+  zone                 = "us-central1-c"
+  region               = "us-central1"
+  tier                 = "db-custom-1-3840"
+  deletion_protection  = false
+  random_instance_name = true
   ip_configuration = {
     ipv4_enabled        = true
     private_network     = null
@@ -105,6 +107,7 @@ This project is licensed under the **MIT** License - see the [LICENSE](https://g
 | <a name="input_database_version"></a> [database\_version](#input\_database\_version) | The database version to use | `string` | n/a | yes |
 | <a name="input_db_charset"></a> [db\_charset](#input\_db\_charset) | The charset for the default database | `string` | `""` | no |
 | <a name="input_db_collation"></a> [db\_collation](#input\_db\_collation) | The collation for the default database. Example: 'en\_US.UTF8' | `string` | `""` | no |
+| <a name="input_db_name"></a> [db\_name](#input\_db\_name) | The name of the database to be created. | `string` | `""` | no |
 | <a name="input_delete_timeout"></a> [delete\_timeout](#input\_delete\_timeout) | The optional timout that is applied to limit long database deletes. | `string` | `"30m"` | no |
 | <a name="input_deletion_protection"></a> [deletion\_protection](#input\_deletion\_protection) | Used to block Terraform from deleting a SQL Instance. | `bool` | `true` | no |
 | <a name="input_deletion_protection_enabled"></a> [deletion\_protection\_enabled](#input\_deletion\_protection\_enabled) | Enables protection of an instance from accidental deletion across all surfaces (API, gcloud, Cloud Console and Terraform). | `bool` | `false` | no |
