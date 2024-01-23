@@ -1,5 +1,6 @@
 module "labels" {
-  source      = "git::https://github.com/cypik/terraform-gcp-labels.git?ref=v1.0.0"
+  source      = "cypik/labels/google"
+  version     = "1.0.1"
   name        = var.name
   environment = var.environment
   label_order = var.label_order
@@ -254,19 +255,7 @@ resource "google_sql_user" "default" {
   deletion_policy = var.user_deletion_policy
 }
 
-resource "google_sql_user" "additional_users" {
-  for_each = local.users
-  project  = data.google_client_config.current.project
-  name     = each.value.name
-  password = each.value.random_password ? random_password.additional_passwords[each.value.name].result : each.value.password
-  instance = google_sql_database_instance.default.name
-  depends_on = [
-    null_resource.module_depends_on,
-    google_sql_database_instance.default,
-    google_sql_database_instance.default,
-  ]
-  deletion_policy = var.user_deletion_policy
-}
+
 
 resource "google_sql_user" "iam_account" {
   for_each = local.iam_users
