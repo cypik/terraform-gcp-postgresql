@@ -8,16 +8,17 @@ provider "google" {
 ##### postgresql-db module call.
 #####==============================================================================
 module "postgresql-db" {
-  source           = "./../../"
-  name             = "example-iam"
-  db_name          = "postgresql"
-  database_version = "POSTGRES_9_6"
-  zone             = "asia-northeast1-a"
-  region           = "asia-northeast1"
-  tier             = "db-custom-1-3840"
-
-  deletion_protection  = false
-  random_instance_name = true
+  source                         = "./../../"
+  name                           = "example-iam"
+  environment                    = "test"
+  db_name                        = "postgresql"
+  database_version               = "POSTGRES_9_6"
+  zone                           = "asia-northeast1-a"
+  region                         = "asia-northeast1"
+  tier                           = "db-custom-1-3840"
+  deletion_protection            = false
+  random_instance_name           = true
+  enable_random_password_special = true
 
   ip_configuration = {
     ipv4_enabled        = true
@@ -34,7 +35,6 @@ module "postgresql-db" {
     password_change_interval    = "3600s"
     reuse_interval              = 1
   }
-  enable_random_password_special = true
 
   database_flags = [
     {

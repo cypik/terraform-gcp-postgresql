@@ -10,7 +10,12 @@ provider "google" {
 module "postgresql-db" {
   source                          = "./../../"
   name                            = "testdb"
-  random_instance_name            = true
+  environment                     = "test"
+  user_name                       = "tftest"
+  user_password                   = "foobar"
+  db_name                         = var.pg_psc_name
+  db_charset                      = "UTF8"
+  db_collation                    = "en_US.UTF8"
   database_version                = "POSTGRES_15"
   region                          = "asia-northeast1"
   tier                            = "db-custom-2-7680"
@@ -19,9 +24,9 @@ module "postgresql-db" {
   maintenance_window_day          = 7
   maintenance_window_hour         = 12
   maintenance_window_update_track = "stable"
-
-  deletion_protection = false
-  database_flags      = [{ name = "autovacuum", value = "off" }]
+  random_instance_name            = true
+  deletion_protection             = false
+  database_flags                  = [{ name = "autovacuum", value = "off" }]
 
   user_labels = {
     foo = "bar"
@@ -47,10 +52,6 @@ module "postgresql-db" {
     retention_unit                 = "COUNT"
   }
 
-  db_name      = var.pg_psc_name
-  db_charset   = "UTF8"
-  db_collation = "en_US.UTF8"
-
   additional_databases = [
     {
       name      = "${var.pg_psc_name}-additional"
@@ -58,9 +59,6 @@ module "postgresql-db" {
       collation = "en_US.UTF8"
     },
   ]
-
-  user_name     = "tftest"
-  user_password = "foobar"
 
   additional_users = [
     {

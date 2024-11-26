@@ -24,6 +24,7 @@ module "postgresql-db" {
   source               = "cypik/postgresql/google"
   version              = "1.0.2"
   name                 = "testdb"
+  environment          = "test"
   db_name              = "postgresql"
   root_password        = "G5PX1SDW0R"
   user_password        = "Y2512FCNU85HEE9"
@@ -52,7 +53,12 @@ module "postgresql-db" {
   source                          = "cypik/postgresql/google"
   version                         = "1.0.2"
   name                            = "testdb"
-  random_instance_name            = true
+  environment                     = "test"
+  user_name                       = "tftest"
+  user_password                   = "foobar"
+  db_name                         = var.pg_psc_name
+  db_charset                      = "UTF8"
+  db_collation                    = "en_US.UTF8"
   database_version                = "POSTGRES_15"
   region                          = "asia-northeast1"
   tier                            = "db-custom-2-7680"
@@ -61,9 +67,9 @@ module "postgresql-db" {
   maintenance_window_day          = 7
   maintenance_window_hour         = 12
   maintenance_window_update_track = "stable"
-
-  deletion_protection = false
-  database_flags      = [{ name = "autovacuum", value = "off" }]
+  random_instance_name            = true
+  deletion_protection             = false
+  database_flags                  = [{ name = "autovacuum", value = "off" }]
 
   user_labels = {
     foo = "bar"
@@ -89,10 +95,6 @@ module "postgresql-db" {
     retention_unit                 = "COUNT"
   }
 
-  db_name      = var.pg_psc_name
-  db_charset   = "UTF8"
-  db_collation = "en_US.UTF8"
-
   additional_databases = [
     {
       name      = "${var.pg_psc_name}-additional"
@@ -100,90 +102,6 @@ module "postgresql-db" {
       collation = "en_US.UTF8"
     },
   ]
-
-  user_name     = "tftest"
-  user_password = "foobar"
-
-  additional_users = [
-    {
-      name            = "tftest2"
-      password        = "abcdefg"
-      host            = "localhost"
-      random_password = false
-    },
-    {
-      name            = "tftest3"
-      password        = "abcdefg"
-      host            = "localhost"
-      random_password = false
-    },
-  ]
-}
-```
-
-## Example: postgresql-ha
-
-```hcl
-module "postgresql-db" {
-  source               = "cypik/postgresql/google"
-  version              = "1.0.2"
-  name                 = var.pg_ha_name
-  random_instance_name = true
-  database_version     = "POSTGRES_9_6"
-  region               = "asia-northeast1"
-
-  tier                            = "db-custom-1-3840"
-  zone                            = "asia-northeast1-a"
-  availability_type               = "REGIONAL"
-  maintenance_window_day          = 7
-  maintenance_window_hour         = 12
-  maintenance_window_update_track = "stable"
-
-  deletion_protection = false
-
-  database_flags = [{ name = "autovacuum", value = "off" }]
-
-  user_labels = {
-    foo = "bar"
-  }
-
-  ip_configuration = {
-    ipv4_enabled       = true
-    ssl_mode           = "ALLOW_UNENCRYPTED_AND_ENCRYPTED"
-    private_network    = null
-    allocated_ip_range = null
-    authorized_networks = [
-      {
-        name  = "cidr"
-        value = var.pg_ha_external_ip_range
-      },
-    ]
-  }
-
-  backup_configuration = {
-    enabled                        = true
-    start_time                     = "20:55"
-    location                       = null
-    point_in_time_recovery_enabled = false
-    transaction_log_retention_days = null
-    retained_backups               = 365
-    retention_unit                 = "COUNT"
-  }
-
-  db_name      = var.pg_ha_name
-  db_charset   = "UTF8"
-  db_collation = "en_US.UTF8"
-
-  additional_databases = [
-    {
-      name      = "${var.pg_ha_name}-additional"
-      charset   = "UTF8"
-      collation = "en_US.UTF8"
-    },
-  ]
-
-  user_name     = "tftest"
-  user_password = "foobar"
 
   additional_users = [
     {
@@ -206,17 +124,18 @@ module "postgresql-db" {
 
 ```hcl
 module "postgresql-db" {
-  source           = "cypik/postgresql/google"
-  version          = "1.0.2"
-  name             = "example-iam"
-  db_name          = "postgresql"
-  database_version = "POSTGRES_9_6"
-  zone             = "asia-northeast1-a"
-  region           = "asia-northeast1"
-  tier             = "db-custom-1-3840"
-
-  deletion_protection  = false
-  random_instance_name = true
+  source                         = "cypik/postgresql/google"
+  version                        = "1.0.2"
+  name                           = "example-iam"
+  environment                    = "test"
+  db_name                        = "postgresql"
+  database_version               = "POSTGRES_9_6"
+  zone                           = "asia-northeast1-a"
+  region                         = "asia-northeast1"
+  tier                           = "db-custom-1-3840"
+  deletion_protection            = false
+  random_instance_name           = true
+  enable_random_password_special = true
 
   ip_configuration = {
     ipv4_enabled        = true
@@ -233,7 +152,6 @@ module "postgresql-db" {
     password_change_interval    = "3600s"
     reuse_interval              = 1
   }
-  enable_random_password_special = true
 
   database_flags = [
     {
@@ -271,6 +189,82 @@ module "postgresql-db" {
       email = "subtest@develop.blueprints.joonix.net"
       type  = "CLOUD_IAM_GROUP"
     }
+  ]
+}
+```
+## Example: postgresql-ha
+
+```hcl
+module "postgresql-db" {
+  source                          = "cypik/postgresql/google"
+  version                         = "1.0.2"
+  name                            = var.pg_ha_name
+  user_name                       = "tftest"
+  environment                     = "test"
+  user_password                   = "foobar"
+  db_name                         = var.pg_ha_name
+  db_charset                      = "UTF8"
+  db_collation                    = "en_US.UTF8"
+  database_version                = "POSTGRES_9_6"
+  region                          = "asia-northeast1"
+  tier                            = "db-custom-1-3840"
+  zone                            = "asia-northeast1-a"
+  availability_type               = "REGIONAL"
+  maintenance_window_day          = 7
+  maintenance_window_hour         = 12
+  maintenance_window_update_track = "stable"
+  deletion_protection             = false
+  random_instance_name            = true
+  database_flags                  = [{ name = "autovacuum", value = "off" }]
+
+  user_labels = {
+    foo = "bar"
+  }
+
+  ip_configuration = {
+    ipv4_enabled       = true
+    ssl_mode           = "ALLOW_UNENCRYPTED_AND_ENCRYPTED"
+    private_network    = null
+    allocated_ip_range = null
+    authorized_networks = [
+      {
+        name  = "cidr"
+        value = var.pg_ha_external_ip_range
+      },
+    ]
+  }
+
+  backup_configuration = {
+    enabled                        = true
+    start_time                     = "20:55"
+    location                       = null
+    point_in_time_recovery_enabled = false
+    transaction_log_retention_days = null
+    retained_backups               = 365
+    retention_unit                 = "COUNT"
+  }
+
+  additional_databases = [
+    {
+      name      = "${var.pg_ha_name}-additional"
+      charset   = "UTF8"
+      collation = "en_US.UTF8"
+    },
+  ]
+
+  additional_users = [
+    {
+      name            = "tftest2"
+      password        = "abcdefg"
+      host            = "localhost"
+      random_password = false
+    },
+    {
+      name            = "tftest3"
+      password        = "abcdefg"
+      host            = "localhost"
+      random_password = false
+    },
   ]
 }
 ```

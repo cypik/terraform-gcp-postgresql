@@ -8,22 +8,25 @@ provider "google" {
 ##### postgresql-db module call.
 #####==============================================================================
 module "postgresql-db" {
-  source               = "./../../"
-  name                 = var.pg_ha_name
-  random_instance_name = true
-  database_version     = "POSTGRES_9_6"
-  region               = "asia-northeast1"
-
+  source                          = "./../../"
+  name                            = var.pg_ha_name
+  user_name                       = "tftest"
+  environment                     = "test"
+  user_password                   = "foobar"
+  db_name                         = var.pg_ha_name
+  db_charset                      = "UTF8"
+  db_collation                    = "en_US.UTF8"
+  database_version                = "POSTGRES_9_6"
+  region                          = "asia-northeast1"
   tier                            = "db-custom-1-3840"
   zone                            = "asia-northeast1-a"
   availability_type               = "REGIONAL"
   maintenance_window_day          = 7
   maintenance_window_hour         = 12
   maintenance_window_update_track = "stable"
-
-  deletion_protection = false
-
-  database_flags = [{ name = "autovacuum", value = "off" }]
+  deletion_protection             = false
+  random_instance_name            = true
+  database_flags                  = [{ name = "autovacuum", value = "off" }]
 
   user_labels = {
     foo = "bar"
@@ -52,10 +55,6 @@ module "postgresql-db" {
     retention_unit                 = "COUNT"
   }
 
-  db_name      = var.pg_ha_name
-  db_charset   = "UTF8"
-  db_collation = "en_US.UTF8"
-
   additional_databases = [
     {
       name      = "${var.pg_ha_name}-additional"
@@ -63,9 +62,6 @@ module "postgresql-db" {
       collation = "en_US.UTF8"
     },
   ]
-
-  user_name     = "tftest"
-  user_password = "foobar"
 
   additional_users = [
     {
