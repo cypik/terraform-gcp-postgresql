@@ -38,11 +38,14 @@ module "postgresql-db" {
   deletion_protection  = false
 
   ip_configuration = {
-    ipv4_enabled        = true
-    private_network     = null
-    ssl_mode            = "ENCRYPTED_ONLY"
-    allocated_ip_range  = null
-    authorized_networks = var.authorized_networks
+    ipv4_enabled       = true
+    private_network    = null
+    ssl_mode           = "ENCRYPTED_ONLY"
+    allocated_ip_range = null
+    authorized_networks = [{
+      name  = "sample-gcp-health-checkers-range"
+      value = "130.211.0.0/28"
+    }]
   }
 }
 ```
@@ -52,11 +55,11 @@ module "postgresql-db" {
 module "postgresql-db" {
   source                          = "cypik/postgresql/google"
   version                         = "1.0.2"
-  name                            = "testdb"
+  name                            = local.name
   environment                     = "test"
   user_name                       = "tftest"
   user_password                   = "foobar"
-  db_name                         = var.pg_psc_name
+  db_name                         = local.name
   db_charset                      = "UTF8"
   db_collation                    = "en_US.UTF8"
   database_version                = "POSTGRES_15"
@@ -97,7 +100,7 @@ module "postgresql-db" {
 
   additional_databases = [
     {
-      name      = "${var.pg_psc_name}-additional"
+      name      = "${local.name}-additional"
       charset   = "UTF8"
       collation = "en_US.UTF8"
     },
@@ -138,11 +141,14 @@ module "postgresql-db" {
   enable_random_password_special = true
 
   ip_configuration = {
-    ipv4_enabled        = true
-    private_network     = null
-    ssl_mode            = "ALLOW_UNENCRYPTED_AND_ENCRYPTED"
-    allocated_ip_range  = null
-    authorized_networks = var.authorized_networks
+    ipv4_enabled       = true
+    private_network    = null
+    ssl_mode           = "ALLOW_UNENCRYPTED_AND_ENCRYPTED"
+    allocated_ip_range = null
+    authorized_networks = [{
+      name  = "sample-gcp-health-checkers-range"
+      value = "130.211.0.0/28"
+    }]
   }
 
   password_validation_policy_config = {
@@ -198,11 +204,11 @@ module "postgresql-db" {
 module "postgresql-db" {
   source                          = "cypik/postgresql/google"
   version                         = "1.0.2"
-  name                            = var.pg_ha_name
+  name                            = local.name
   user_name                       = "tftest"
   environment                     = "test"
   user_password                   = "foobar"
-  db_name                         = var.pg_ha_name
+  db_name                         = local.name
   db_charset                      = "UTF8"
   db_collation                    = "en_US.UTF8"
   database_version                = "POSTGRES_9_6"
@@ -229,7 +235,7 @@ module "postgresql-db" {
     authorized_networks = [
       {
         name  = "cidr"
-        value = var.pg_ha_external_ip_range
+        value = "192.10.10.10/32"
       },
     ]
   }
@@ -246,7 +252,7 @@ module "postgresql-db" {
 
   additional_databases = [
     {
-      name      = "${var.pg_ha_name}-additional"
+      name      = "${local.name}-additional"
       charset   = "UTF8"
       collation = "en_US.UTF8"
     },

@@ -4,16 +4,20 @@ provider "google" {
   zone    = "asia-northeast1-a"
 }
 
+locals {
+  name = "testdb"
+}
+
 #####==============================================================================
 ##### postgresql-db module call.
 #####==============================================================================
 module "postgresql-db" {
   source                          = "./../../"
-  name                            = "testdb"
+  name                            = local.name
   environment                     = "test"
   user_name                       = "tftest"
   user_password                   = "foobar"
-  db_name                         = var.pg_psc_name
+  db_name                         = local.name
   db_charset                      = "UTF8"
   db_collation                    = "en_US.UTF8"
   database_version                = "POSTGRES_15"
@@ -54,7 +58,7 @@ module "postgresql-db" {
 
   additional_databases = [
     {
-      name      = "${var.pg_psc_name}-additional"
+      name      = "${local.name}-additional"
       charset   = "UTF8"
       collation = "en_US.UTF8"
     },

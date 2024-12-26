@@ -24,10 +24,13 @@ module "postgresql-db" {
   deletion_protection  = false
 
   ip_configuration = {
-    ipv4_enabled        = true
-    private_network     = null
-    ssl_mode            = "ENCRYPTED_ONLY"
-    allocated_ip_range  = null
-    authorized_networks = var.authorized_networks
+    ipv4_enabled       = true
+    private_network    = null
+    ssl_mode           = "ENCRYPTED_ONLY"
+    allocated_ip_range = null
+    authorized_networks = [{
+      name  = "sample-gcp-health-checkers-range"
+      value = "130.211.0.0/28"
+    }]
   }
 }

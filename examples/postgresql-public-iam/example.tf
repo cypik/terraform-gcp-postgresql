@@ -21,11 +21,14 @@ module "postgresql-db" {
   enable_random_password_special = true
 
   ip_configuration = {
-    ipv4_enabled        = true
-    private_network     = null
-    ssl_mode            = "ALLOW_UNENCRYPTED_AND_ENCRYPTED"
-    allocated_ip_range  = null
-    authorized_networks = var.authorized_networks
+    ipv4_enabled       = true
+    private_network    = null
+    ssl_mode           = "ALLOW_UNENCRYPTED_AND_ENCRYPTED"
+    allocated_ip_range = null
+    authorized_networks = [{
+      name  = "sample-gcp-health-checkers-range"
+      value = "130.211.0.0/28"
+    }]
   }
 
   password_validation_policy_config = {
@@ -61,7 +64,7 @@ module "postgresql-db" {
   iam_users = [
     {
       id    = "cloudsql_pg_sa",
-      email = "example@gmail.com"
+      email = "thesureshyadav76@gmail.com"
     },
     {
       id    = "dbadmin",

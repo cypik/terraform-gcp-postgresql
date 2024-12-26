@@ -4,16 +4,20 @@ provider "google" {
   zone    = "asia-northeast1-a"
 }
 
+locals {
+  name = "tftest"
+}
+
 #####==============================================================================
 ##### postgresql-db module call.
 #####==============================================================================
 module "postgresql-db" {
   source                          = "./../../"
-  name                            = var.pg_ha_name
+  name                            = local.name
   user_name                       = "tftest"
   environment                     = "test"
   user_password                   = "foobar"
-  db_name                         = var.pg_ha_name
+  db_name                         = local.name
   db_charset                      = "UTF8"
   db_collation                    = "en_US.UTF8"
   database_version                = "POSTGRES_9_6"
@@ -40,7 +44,7 @@ module "postgresql-db" {
     authorized_networks = [
       {
         name  = "cidr"
-        value = var.pg_ha_external_ip_range
+        value = "192.10.10.10/32"
       },
     ]
   }
@@ -57,7 +61,7 @@ module "postgresql-db" {
 
   additional_databases = [
     {
-      name      = "${var.pg_ha_name}-additional"
+      name      = "${local.name}-additional"
       charset   = "UTF8"
       collation = "en_US.UTF8"
     },
