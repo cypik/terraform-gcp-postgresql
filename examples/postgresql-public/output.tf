@@ -1,7 +1,7 @@
 output "name" {
-  description = "The name for Cloud SQL instance"
   value       = module.postgresql-db.name
   sensitive   = true
+  description = "The name for Cloud SQL instance"
 }
 
 output "self_link" {
@@ -16,13 +16,14 @@ output "psql_user_pass" {
 }
 
 output "public_ip_address" {
-  description = "The first public (PRIMARY) IPv4 address assigned for the master instance"
   value       = module.postgresql-db.public_ip_address
+  sensitive   = false
+  description = "The first public (PRIMARY) IPv4 address assigned for the master instance"
 }
 
 output "private_ip_address" {
-  description = "The first private (PRIVATE) IPv4 address assigned for the master instance"
   value       = module.postgresql-db.private_ip_address
+  description = "The first private (PRIVATE) IPv4 address assigned for the master instance"
 }
 
 output "ip_address" {
@@ -42,6 +43,7 @@ output "connection_name" {
 
 output "server_ca_cert" {
   value       = module.postgresql-db.server_ca_cert
+  sensitive   = true
   description = "The CA certificate information used to connect to the SQL instance via SSL"
 }
 
@@ -56,25 +58,25 @@ output "psc_service_attachment_link" {
 }
 
 output "generated_user_password" {
-  description = "The auto generated default user password if not input password was provided"
   value       = module.postgresql-db.generated_user_password
   sensitive   = true
+  description = "The auto generated default user password if not input password was provided"
 }
 
 output "primary" {
   value       = module.postgresql-db.primary
-  description = "The `google_sql_database_instance` resource representing the primary instance"
   sensitive   = true
+  description = "The `google_sql_database_instance` resource representing the primary instance"
 }
 
 output "replicas" {
   value       = module.postgresql-db.replicas
-  description = "A list of `google_sql_database_instance` resources representing the replicas"
   sensitive   = true
+  description = "A list of `google_sql_database_instance` resources representing the replicas"
 }
 
 output "instances" {
   value       = module.postgresql-db.instances
-  description = "A list of all `google_sql_database_instance` resources we've created"
   sensitive   = true
+  description = "A list of all `google_sql_database_instance` resources we've created"
 }

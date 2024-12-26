@@ -1,18 +1,20 @@
 module "labels" {
   source      = "cypik/labels/google"
-  version     = "1.0.1"
+  version     = "1.0.2"
   name        = var.name
   environment = var.environment
   label_order = var.label_order
   managedby   = var.managedby
   repository  = var.repository
+  extra_tags  = var.extra_tags
 }
 
 data "google_client_config" "current" {
 }
 
 locals {
-  master_instance_name     = var.random_instance_name ? "${format("%s", module.labels.id)}-${random_id.suffix[0].hex}" : format("%s", module.labels.id)
+  instance_name            = var.random_instance_name ? "${format("%s", module.labels.id)}-${random_id.suffix[0].hex}" : format("%s", module.labels.id)
+  is_secondary_instance    = var.master_instance_name != null
   ip_configuration_enabled = length(keys(var.ip_configuration)) > 0 ? true : false
   ip_configurations = {
     enabled  = var.ip_configuration
@@ -40,24 +42,33 @@ resource "random_id" "suffix" {
   byte_length = 4
 }
 
+#tfsec:ignore:google-sql-encrypt-in-transit-data
 resource "google_sql_database_instance" "default" {
   project             = data.google_client_config.current.project
-  name                = local.master_instance_name
+  name                = local.instance_name
   database_version    = can(regex("\\d", substr(var.database_version, 0, 1))) ? format("POSTGRES_%s", var.database_version) : replace(var.database_version, substr(var.database_version, 0, 8), "POSTGRES")
   region              = var.region
   encryption_key_name = var.encryption_key_name
   deletion_protection = var.deletion_protection
+  root_password       = var.root_password
+
+  master_instance_name = var.master_instance_name
+  instance_type        = local.is_secondary_instance ? "READ_REPLICA_INSTANCE" : var.instance_type
+
 
   settings {
-    tier                        = var.tier
-    edition                     = var.edition
-    activation_policy           = var.activation_policy
-    availability_type           = var.availability_type
-    deletion_protection_enabled = var.deletion_protection_enabled
-    connector_enforcement       = local.connector_enforcement
+    tier                         = var.tier
+    edition                      = var.edition
+    activation_policy            = var.activation_policy
+    availability_type            = var.availability_type
+    deletion_protection_enabled  = var.deletion_protection_enabled
+    connector_enforcement        = local.connector_enforcement
+    enable_google_ml_integration = var.enable_google_ml_integration
+    user_labels                  = var.user_labels
+
 
     dynamic "backup_configuration" {
-      for_each = [var.backup_configuration]
+      for_each = local.is_secondary_instance ? [] : [var.backup_configuration]
       content {
         enabled                        = local.backups_enabled
         start_time                     = lookup(backup_configuration.value, "start_time", null)
@@ -74,20 +85,29 @@ resource "google_sql_database_instance" "default" {
         }
       }
     }
+
+    dynamic "data_cache_config" {
+      for_each = var.edition == "ENTERPRISE_PLUS" && var.data_cache_enabled ? ["cache_enabled"] : []
+      content {
+        data_cache_enabled = var.data_cache_enabled
+      }
+    }
+
     dynamic "deny_maintenance_period" {
-      for_each = var.deny_maintenance_period
+      for_each = local.is_secondary_instance ? [] : var.deny_maintenance_period
       content {
         end_date   = lookup(deny_maintenance_period.value, "end_date", null)
         start_date = lookup(deny_maintenance_period.value, "start_date", null)
         time       = lookup(deny_maintenance_period.value, "time", null)
       }
     }
+
     dynamic "ip_configuration" {
       for_each = [local.ip_configurations[local.ip_configuration_enabled ? "enabled" : "disabled"]]
       content {
         ipv4_enabled                                  = lookup(ip_configuration.value, "ipv4_enabled", null)
         private_network                               = lookup(ip_configuration.value, "private_network", null)
-        require_ssl                                   = lookup(ip_configuration.value, "require_ssl", null)
+        ssl_mode                                      = lookup(ip_configuration.value, "ssl_mode", null)
         allocated_ip_range                            = lookup(ip_configuration.value, "allocated_ip_range", null)
         enable_private_path_for_google_cloud_services = lookup(ip_configuration.value, "enable_private_path_for_google_cloud_services", false)
 
@@ -110,6 +130,7 @@ resource "google_sql_database_instance" "default" {
 
       }
     }
+
     dynamic "insights_config" {
       for_each = var.insights_config != null ? [var.insights_config] : []
 
@@ -123,7 +144,7 @@ resource "google_sql_database_instance" "default" {
     }
 
     dynamic "password_validation_policy" {
-      for_each = var.password_validation_policy_config != null ? [var.password_validation_policy_config] : []
+      for_each = !local.is_secondary_instance && var.password_validation_policy_config != null ? [var.password_validation_policy_config] : []
 
       content {
         enable_password_policy      = true
@@ -140,6 +161,7 @@ resource "google_sql_database_instance" "default" {
     disk_size             = var.disk_size
     disk_type             = var.disk_type
     pricing_plan          = var.pricing_plan
+
     dynamic "database_flags" {
       for_each = var.database_flags
       content {
@@ -148,21 +170,22 @@ resource "google_sql_database_instance" "default" {
       }
     }
 
-    user_labels = var.user_labels
-
     dynamic "location_preference" {
       for_each = var.zone != null ? ["location_preference"] : []
       content {
         zone                   = var.zone
-        secondary_zone         = var.secondary_zone
-        follow_gae_application = var.follow_gae_application
+        secondary_zone         = local.is_secondary_instance ? null : var.secondary_zone
+        follow_gae_application = local.is_secondary_instance ? null : var.follow_gae_application
       }
     }
 
-    maintenance_window {
-      day          = var.maintenance_window_day
-      hour         = var.maintenance_window_hour
-      update_track = var.maintenance_window_update_track
+    dynamic "maintenance_window" {
+      for_each = local.is_secondary_instance ? [] : ["maintenance_window"]
+      content {
+        day          = var.maintenance_window_day
+        hour         = var.maintenance_window_hour
+        update_track = var.maintenance_window_update_track
+      }
     }
   }
 
@@ -171,7 +194,6 @@ resource "google_sql_database_instance" "default" {
       settings[0].disk_size
     ]
   }
-
   timeouts {
     create = var.create_timeout
     update = var.update_timeout
@@ -187,8 +209,8 @@ resource "google_sql_database" "default" {
   instance        = google_sql_database_instance.default.name
   charset         = var.db_charset
   collation       = var.db_collation
-  depends_on      = [null_resource.module_depends_on, google_sql_database_instance.default]
   deletion_policy = var.database_deletion_policy
+  depends_on      = [null_resource.module_depends_on, google_sql_database_instance.default]
 }
 
 resource "google_sql_database" "additional_databases" {
@@ -202,7 +224,8 @@ resource "google_sql_database" "additional_databases" {
   deletion_policy = var.database_deletion_policy
 }
 
-resource "random_password" "user-password" {
+resource "random_password" "user_password" {
+  count = var.enable_default_user ? 1 : 0
   keepers = {
     name = google_sql_database_instance.default.name
   }
@@ -223,6 +246,7 @@ resource "random_password" "user-password" {
 
 resource "random_password" "additional_passwords" {
   for_each = local.users
+
   keepers = {
     name = google_sql_database_instance.default.name
   }
@@ -246,31 +270,36 @@ resource "google_sql_user" "default" {
   name     = var.user_name
   project  = data.google_client_config.current.project
   instance = google_sql_database_instance.default.name
-  password = var.user_password == "" ? random_password.user-password.result : var.user_password
+  password = var.user_password != "" ? var.user_password : random_password.user_password[count.index].result
+
   depends_on = [
     null_resource.module_depends_on,
-    google_sql_database_instance.default,
     google_sql_database_instance.default,
   ]
   deletion_policy = var.user_deletion_policy
 }
 
 
-
 resource "google_sql_user" "iam_account" {
   for_each = local.iam_users
-  project  = data.google_client_config.current.project
+
+  project = data.google_client_config.current.project
   name = each.value.is_account_sa ? (
     trimsuffix(each.value.email, ".gserviceaccount.com")
     ) : (
     each.value.email
   )
-  instance = google_sql_database_instance.default.name
-  type     = each.value.is_account_sa ? "CLOUD_IAM_SERVICE_ACCOUNT" : "CLOUD_IAM_USER"
-  depends_on = [
-    null_resource.module_depends_on,
-  ]
+  instance        = google_sql_database_instance.default.name
+  type            = each.value.is_account_sa ? "CLOUD_IAM_SERVICE_ACCOUNT" : "CLOUD_IAM_USER"
+  depends_on      = [null_resource.module_depends_on, ]
   deletion_policy = var.user_deletion_policy
+}
+
+resource "google_project_iam_member" "database_integration" {
+  for_each = toset(var.database_integration_roles)
+  project  = data.google_client_config.current.project
+  role     = each.value
+  member   = "serviceAccount:${google_sql_database_instance.default.service_account_email_address}"
 }
 
 resource "null_resource" "module_depends_on" {
