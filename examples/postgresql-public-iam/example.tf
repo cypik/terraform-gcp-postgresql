@@ -64,7 +64,7 @@ module "postgresql-db" {
   iam_users = [
     {
       id    = "cloudsql_pg_sa",
-      email = "thesureshyadav76@gmail.com"
+      email = "example@gmail.com"
     },
     {
       id    = "dbadmin",

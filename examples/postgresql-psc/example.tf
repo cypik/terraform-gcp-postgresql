@@ -5,7 +5,7 @@ provider "google" {
 }
 
 locals {
-  name = "testdb"
+  name = "demo"
 }
 
 #####==============================================================================
@@ -15,9 +15,9 @@ module "postgresql-db" {
   source                          = "./../../"
   name                            = local.name
   environment                     = "test"
-  user_name                       = "tftest"
+  user_name                       = "app"
   user_password                   = "foobar"
-  db_name                         = local.name
+  db_name                         = "dbtest"
   db_charset                      = "UTF8"
   db_collation                    = "en_US.UTF8"
   database_version                = "POSTGRES_15"

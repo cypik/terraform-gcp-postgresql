@@ -57,9 +57,9 @@ module "postgresql-db" {
   version                         = "1.0.2"
   name                            = local.name
   environment                     = "test"
-  user_name                       = "tftest"
+  user_name                       = "app"
   user_password                   = "foobar"
-  db_name                         = local.name
+  db_name                         = "dbtest"
   db_charset                      = "UTF8"
   db_collation                    = "en_US.UTF8"
   database_version                = "POSTGRES_15"
@@ -205,10 +205,10 @@ module "postgresql-db" {
   source                          = "cypik/postgresql/google"
   version                         = "1.0.2"
   name                            = local.name
-  user_name                       = "tftest"
+  user_name                       = "app"
   environment                     = "test"
   user_password                   = "foobar"
-  db_name                         = local.name
+  db_name                         = "dbtest"
   db_charset                      = "UTF8"
   db_collation                    = "en_US.UTF8"
   database_version                = "POSTGRES_9_6"
